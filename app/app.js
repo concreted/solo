@@ -1,8 +1,9 @@
-var Tetromino = function(x,y) {
+var Tetromino = function(x,y, size) {
+  this.size = size;
   this.location = [x,y];
 };
 
-var Square = function(x,y){
+var Square = function(x,y,size){
   Tetromino.apply(this, arguments);
 
 };
@@ -29,10 +30,10 @@ Tetromino.prototype.isClear = function() {
 Square.prototype = Object.create(Tetromino.prototype);
 Square.prototype.constructor = Square;
 Square.prototype.position = function() {
-  return [[this.location[0], this.location[1]],
-          [this.location[0]+1, this.location[1]],
-          [this.location[0], this.location[1]+1],
-          [this.location[0]+1, this.location[1]+1]];
+  return [{x: this.location[0] * this.size, y: this.location[1] * this.size},
+          {x: this.location[0]+1 * this.size, y: this.location[1] * this.size},
+          {x: this.location[0] * this.size, y: this.location[1]+1 * this.size},
+          {x: this.location[0]+1 * this.size, y: this.location[1]+1 * this.size}];
 };
 
 var makeGrid= function(height, width) {
@@ -47,11 +48,7 @@ var makeGrid= function(height, width) {
 };
 
 var Game = function(mode, speed) {
-  var grid = makeGrid(10,10);
-  console.log(grid);
-  var inPlay = new Square(0,0);
-  console.log(inPlay.location);
-  console.log(inPlay.position());
+
   // setinterval
   // on each tick:
   // descend current piece
@@ -64,29 +61,39 @@ var Game = function(mode, speed) {
   // update its position
 
 
-  setInterval(function() {
-    // erase old position
-    _.each(inPlay.position(), function(pos) {
-      //debugger;
-      grid[pos[0]][pos[1]] = 0;
-    });
-    // move piece down one
-    inPlay.drop();
-    // place new position
-    //debugger;
-    _.each(inPlay.position(), function(pos) {
-      grid[pos[0]][pos[1]] = 1;
-    });
-    console.log(grid);
+  // setInterval(function() {
+  //   // erase old position
+  //   _.each(inPlay.position(), function(pos) {
+  //     //debugger;
+  //     grid[pos[0]][pos[1]] = 0;
+  //   });
+  //   // move piece down one
+  //   inPlay.drop();
+  //   // place new position
+  //   //debugger;
+  //   _.each(inPlay.position(), function(pos) {
+  //     grid[pos[0]][pos[1]] = 1;
+  //   });
+  //   console.log(grid);
 
-  }, 1000);
+  // }, 1000);
 };
 
 
 // data is the whole grid: every turn it will be one row lower
-var update = function(grid) {
+var updateInPlay = function(piece) {
+  //debugger;
+  var svg = d3.select('svg');
+  var active = svg.selectAll('.inplay').data(piece.position());
+  active.enter().append('rect');
 
-}
+  active.transition().duration(1000)
+    .attr('x', function(d, i) { return d.x; })
+    .attr('y', function(d, i) { return d.y; })
+    .attr('height', piece.size)
+    .attr('width', piece.size)
+    .attr('fill', '#000000')
+};
 
 //update loop - based on speed
 //update position of current piece
@@ -98,6 +105,7 @@ height = 500;
 
 grid_height = 10;
 grid_width = 10;
+block_size = 30;
 
 var svg = d3.select("body").append("svg")
   .attr("width", width)
@@ -107,14 +115,20 @@ var svg = d3.select("body").append("svg")
 
 for (var i = 0; i < grid_height; i++) {
   for (var j = 0; j < grid_width; j++) {
-    d3.select('svg').append('image')
+    d3.select('svg').append('rect')
       .attr('class', 'empty')
-      .attr('fill', 'red')
-      .attr('height', 30)
-      .attr('width', 30)
-      .attr('x', 50 * j)
-      .attr('y', 50 * i);
+      .attr('fill', '#666666')
+      .attr('height', block_size)
+      .attr('width', block_size)
+      .attr('x', block_size * j)
+      .attr('y', block_size * i);
   }
 }
 
-Game();
+  var grid = makeGrid(10,10);
+  console.log(grid);
+  var inPlay = new Square(0,0, 30);
+  console.log(inPlay.location);
+  console.log(inPlay.position());
+
+  updateInPlay(inPlay)
