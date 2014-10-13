@@ -19,7 +19,7 @@ Tetromino.prototype.rotateLeft = function() {
 };
 
 Tetromino.prototype.drop = function() {
-  this.location[0]++;
+  this.location[1]++;
 };
 
 Tetromino.prototype.isClear = function() {
@@ -29,6 +29,12 @@ Tetromino.prototype.isClear = function() {
 
 Square.prototype = Object.create(Tetromino.prototype);
 Square.prototype.constructor = Square;
+Square.prototype.positionGrid = function() {
+  return [{x: this.location[0], y: this.location[1]},
+          {x: this.location[0]+1, y: this.location[1]},
+          {x: this.location[0], y: this.location[1]+1},
+          {x: this.location[0]+1, y: this.location[1]+1}];
+};
 Square.prototype.position = function() {
   return [{x: this.location[0] * this.size, y: this.location[1] * this.size},
           {x: this.location[0]+1 * this.size, y: this.location[1] * this.size},
@@ -61,22 +67,7 @@ var Game = function(mode, speed) {
   // update its position
 
 
-  // setInterval(function() {
-  //   // erase old position
-  //   _.each(inPlay.position(), function(pos) {
-  //     //debugger;
-  //     grid[pos[0]][pos[1]] = 0;
-  //   });
-  //   // move piece down one
-  //   inPlay.drop();
-  //   // place new position
-  //   //debugger;
-  //   _.each(inPlay.position(), function(pos) {
-  //     grid[pos[0]][pos[1]] = 1;
-  //   });
-  //   console.log(grid);
 
-  // }, 1000);
 };
 
 
@@ -131,4 +122,24 @@ for (var i = 0; i < grid_height; i++) {
   console.log(inPlay.location);
   console.log(inPlay.position());
 
-  updateInPlay(inPlay)
+  updateInPlay(inPlay);
+
+  setInterval(function() {
+    // erase old position
+    _.each(inPlay.positionGrid(), function(pos) {
+      if (grid[pos.x] === undefined) debugger;
+      grid[pos.x][pos.y] = 0;
+    });
+    // check if clear below piece
+    // move piece down one
+    inPlay.drop();
+
+    // place new position
+    _.each(inPlay.positionGrid(), function(pos) {
+      grid[pos.x][pos.y] = 1;
+    });
+
+    // render in d3
+    updateInPlay(inPlay);
+
+  }, 1000);
