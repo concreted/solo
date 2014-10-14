@@ -1,4 +1,8 @@
-var Tetromino = function(x,y, size) {
+var grid_height = 2;
+var grid_width = 10;
+var block_size = 30;
+
+var Tetromino = function(x, y, size) {
   this.size = size;
   this.location = [x,y];
 };
@@ -22,10 +26,7 @@ Tetromino.prototype.drop = function() {
   this.location[1]++;
 };
 
-Tetromino.prototype.isClear = function() {
-  var position = this.position();
-  // check if underneath is clear
-};
+
 
 Square.prototype = Object.create(Tetromino.prototype);
 Square.prototype.constructor = Square;
@@ -37,9 +38,19 @@ Square.prototype.positionGrid = function() {
 };
 Square.prototype.position = function() {
   return [{x: this.location[0] * this.size, y: this.location[1] * this.size},
-          {x: this.location[0]+1 * this.size, y: this.location[1] * this.size},
-          {x: this.location[0] * this.size, y: this.location[1]+1 * this.size},
-          {x: this.location[0]+1 * this.size, y: this.location[1]+1 * this.size}];
+          {x: (this.location[0]+1) * this.size, y: this.location[1] * this.size},
+          {x: this.location[0] * this.size, y: (this.location[1]+1) * this.size},
+          {x: (this.location[0]+1) * this.size, y: (this.location[1]+1) * this.size}];
+};
+
+Square.prototype.isClear = function(grid) {
+  var position = this.positionGrid();
+  var bottomPieces = [position[2], position[3]];
+  // check if underneath is clear
+  //debugger;
+  return _.every(bottomPieces, function(pos) {
+    return (grid[pos.x][pos.y + 1] !== undefined && grid[pos.x][pos.y + 1] === 0)
+  });
 };
 
 var makeGrid= function(height, width) {
@@ -78,12 +89,15 @@ var updateInPlay = function(piece) {
   var active = svg.selectAll('.inplay').data(piece.position());
   active.enter().append('rect');
 
-  active.transition().duration(1000)
+  active.transition()
     .attr('x', function(d, i) { return d.x; })
     .attr('y', function(d, i) { return d.y; })
+    .attr('class', 'inplay')
     .attr('height', piece.size)
     .attr('width', piece.size)
     .attr('fill', '#000000')
+
+  active.exit().remove();
 };
 
 //update loop - based on speed
@@ -94,9 +108,7 @@ var updateInPlay = function(piece) {
 var width = 960,
 height = 500;
 
-grid_height = 10;
-grid_width = 10;
-block_size = 30;
+
 
 var svg = d3.select("body").append("svg")
   .attr("width", width)
@@ -116,7 +128,7 @@ for (var i = 0; i < grid_height; i++) {
   }
 }
 
-  var grid = makeGrid(10,10);
+  var grid = makeGrid(grid_height, grid_width);
   console.log(grid);
   var inPlay = new Square(0,0, 30);
   console.log(inPlay.location);
@@ -126,13 +138,16 @@ for (var i = 0; i < grid_height; i++) {
 
   setInterval(function() {
     // erase old position
+
     _.each(inPlay.positionGrid(), function(pos) {
-      if (grid[pos.x] === undefined) debugger;
+      if (grid[pos.x][pos.y] === undefined) debugger;
       grid[pos.x][pos.y] = 0;
     });
     // check if clear below piece
     // move piece down one
-    inPlay.drop();
+    if (inPlay.isClear(grid)) {
+      inPlay.drop();
+    }
 
     // place new position
     _.each(inPlay.positionGrid(), function(pos) {
