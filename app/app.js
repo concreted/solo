@@ -88,22 +88,23 @@ for (var i = 0; i < grid_height; i++) {
   updateInPlay(inPlay);
 
   setInterval(function() {
-    // erase old position
 
-    _.each(inPlay.positionGrid(), function(pos) {
-      if (grid[pos.x][pos.y] === undefined) debugger;
-      grid[pos.x][pos.y] = 0;
-    });
     // check if clear below piece
-    // move piece down one
     if (inPlay.isClear(grid)) {
-      inPlay.drop();
-    }
+      // erase old position
+      _.each(inPlay.positionGrid(), function(pos) {
+      if (grid[pos.x][pos.y] === undefined) debugger;
+        grid[pos.y][pos.x] = 0;
+      });
 
-    // place new position
-    _.each(inPlay.positionGrid(), function(pos) {
-      grid[pos.x][pos.y] = 1;
-    });
+      // move piece down one
+      inPlay.drop();
+
+      // place new position
+      _.each(inPlay.positionGrid(), function(pos) {
+        grid[pos.y][pos.x] = 1;
+      });
+    }
 
     // render in d3
     updateInPlay(inPlay);
