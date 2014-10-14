@@ -1,57 +1,8 @@
-var grid_height = 2;
+var grid_height = 5;
 var grid_width = 10;
 var block_size = 30;
 
-var Tetromino = function(x, y, size) {
-  this.size = size;
-  this.location = [x,y];
-};
 
-var Square = function(x,y,size){
-  Tetromino.apply(this, arguments);
-
-};
-
-
-
-Tetromino.prototype.rotateRight = function() {
-
-};
-
-Tetromino.prototype.rotateLeft = function() {
-
-};
-
-Tetromino.prototype.drop = function() {
-  this.location[1]++;
-};
-
-
-
-Square.prototype = Object.create(Tetromino.prototype);
-Square.prototype.constructor = Square;
-Square.prototype.positionGrid = function() {
-  return [{x: this.location[0], y: this.location[1]},
-          {x: this.location[0]+1, y: this.location[1]},
-          {x: this.location[0], y: this.location[1]+1},
-          {x: this.location[0]+1, y: this.location[1]+1}];
-};
-Square.prototype.position = function() {
-  return [{x: this.location[0] * this.size, y: this.location[1] * this.size},
-          {x: (this.location[0]+1) * this.size, y: this.location[1] * this.size},
-          {x: this.location[0] * this.size, y: (this.location[1]+1) * this.size},
-          {x: (this.location[0]+1) * this.size, y: (this.location[1]+1) * this.size}];
-};
-
-Square.prototype.isClear = function(grid) {
-  var position = this.positionGrid();
-  var bottomPieces = [position[2], position[3]];
-  // check if underneath is clear
-  //debugger;
-  return _.every(bottomPieces, function(pos) {
-    return (grid[pos.x][pos.y + 1] !== undefined && grid[pos.x][pos.y + 1] === 0)
-  });
-};
 
 var makeGrid= function(height, width) {
   // represent grid as 2d array of 0s/1s
