@@ -101,23 +101,59 @@ var handleKeys = function () {
   if (event.keyCode === 37 || event.keyCode === 38 || event.keyCode === 39 || event.keyCode === 40)
   d3.event.preventDefault();
   if (event.keyCode === 37) {
+    _.each(inPlay.positionGrid(), function(pos) {      
+      grid[pos.y][pos.x] = 0;
+    });
+
+
     inPlay.moveLeft();
     console.log('left!');
-    updateInPlay(inPlay);
+
+    _.each(inPlay.positionGrid(), function(pos) {
+      grid[pos.y][pos.x] = 1;
+    });
+    
+ 
+
+   updateInPlay(inPlay);
   }
   if (event.keyCode === 38) {
     console.log('up!');
 
   }
   if (event.keyCode === 39) {
+    _.each(inPlay.positionGrid(), function(pos) {      
+      grid[pos.y][pos.x] = 0;
+    });
+
+    
+
     inPlay.moveRight();
     console.log('right!');
-    updateInPlay(inPlay);
+    _.each(inPlay.positionGrid(), function(pos) {
+      grid[pos.y][pos.x] = 1;
+    });
+    
+    
+
+   updateInPlay(inPlay);
   }
   if (event.keyCode === 40) {
+    _.each(inPlay.positionGrid(), function(pos) {      
+      grid[pos.y][pos.x] = 0;
+    });
+
+    // move piece down one
+
     inPlay.drop();
     console.log('down!');
-    updateInPlay(inPlay);
+
+    // place new position
+    _.each(inPlay.positionGrid(), function(pos) {
+      grid[pos.y][pos.x] = 1;
+    });
+ 
+   updateInPlay(inPlay);
   }
 }
   // Capture keydown
@@ -134,7 +170,11 @@ var handleKeys = function () {
   updateInPlay(inPlay);
 
   setInterval(function() {
-
+    // check if piece is sitting on anything
+    if (inPlay.isClear(grid)) {
+      placing = false;
+    }
+    
     // Put piece in final position
     if (placing) {
       placePiece();
@@ -151,8 +191,7 @@ var handleKeys = function () {
     // check if clear below piece
     if (inPlay.isClear(grid)) {
       // erase old position
-      _.each(inPlay.positionGrid(), function(pos) {
-      if (grid[pos.y][pos.x] === undefined) debugger;
+      _.each(inPlay.positionGrid(), function(pos) {      
         grid[pos.y][pos.x] = 0;
       });
 

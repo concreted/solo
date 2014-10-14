@@ -15,6 +15,7 @@
     "tests"
   ],
   "dependencies": {
-    "d3": "~3.4.12"
+    "d3": "~3.4.12",
+    "underscore": "~1.7.0"
   }
 }
