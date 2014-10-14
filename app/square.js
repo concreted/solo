@@ -1,4 +1,4 @@
-var Square = function(x,y,size){
+var Square = function(x, y, size, grid){
   Tetromino.apply(this, arguments);
 
 };
@@ -18,12 +18,12 @@ Square.prototype.position = function() {
           {x: (this.location[0]+1) * this.size, y: (this.location[1]+1) * this.size}];
 };
 
-Square.prototype.isClear = function(grid) {
+Square.prototype.isClear = function() {
   var position = this.positionGrid();
   var bottomPieces = [position[2], position[3]];
   // check if underneath is clear
   //debugger;
   return _.every(bottomPieces, function(pos) {
-    return (grid[pos.y+1] !== undefined && grid[pos.y+1][pos.x] === 0)
+    return (this.grid[pos.y+1] !== undefined && this.grid[pos.y+1][pos.x] === 0)
   });
 };

@@ -1,8 +1,8 @@
-var grid_height = 5;
+var grid_height = 15;
 var grid_width = 10;
 var block_size = 30;
 
-
+var inPlay = null;
 
 var makeGrid= function(height, width) {
   // represent grid as 2d array of 0s/1s
@@ -13,6 +13,12 @@ var makeGrid= function(height, width) {
   }
 
   return grid;
+};
+
+var displayGrid = function(grid) {
+  for (var i = 0; i < grid.length; i++) {
+    console.log(JSON.stringify(grid[i]));
+  }
 };
 
 var Game = function(mode, speed) {
@@ -32,7 +38,14 @@ var Game = function(mode, speed) {
 
 };
 
+var placePiece = function() {
+  var svg = d3.select('svg');
+  var active = svg.selectAll('.inplay');
 
+  active//.transition()
+    .classed({'inplay': false, 'placed': true});
+
+};
 // data is the whole grid: every turn it will be one row lower
 var updateInPlay = function(piece) {
   //debugger;
@@ -40,13 +53,15 @@ var updateInPlay = function(piece) {
   var active = svg.selectAll('.inplay').data(piece.position());
   active.enter().append('rect');
 
-  active.transition()
+  active//.transition()
     .attr('x', function(d, i) { return d.x; })
     .attr('y', function(d, i) { return d.y; })
     .attr('class', 'inplay')
     .attr('height', piece.size)
     .attr('width', piece.size)
     .attr('fill', '#000000')
+    .attr('stroke', 'white')
+    .attr('stroke-width', 2)
 
   active.exit().remove();
 };
@@ -75,32 +90,44 @@ for (var i = 0; i < grid_height; i++) {
       .attr('height', block_size)
       .attr('width', block_size)
       .attr('x', block_size * j)
-      .attr('y', block_size * i);
+      .attr('y', block_size * i)
+      .attr('stroke', 'white')
+      .attr('stroke-width', 2)
   }
 }
 
 var handleKeys = function () {
   //console.log(event);
+  if (event.keyCode === 37 || event.keyCode === 38 || event.keyCode === 39 || event.keyCode === 40)
   d3.event.preventDefault();
   if (event.keyCode === 37) {
+    inPlay.moveLeft();
     console.log('left!');
+    updateInPlay(inPlay);
   }
   if (event.keyCode === 38) {
     console.log('up!');
+
   }
   if (event.keyCode === 39) {
+    inPlay.moveRight();
     console.log('right!');
+    updateInPlay(inPlay);
   }
   if (event.keyCode === 40) {
+    inPlay.drop();
     console.log('down!');
+    updateInPlay(inPlay);
   }
 }
   // Capture keydown
   d3.select("body").on("keydown", handleKeys);
 
   var grid = makeGrid(grid_height, grid_width);
+  var placing = false;
+
   console.log(grid);
-  var inPlay = new Square(0,0, 30);
+  inPlay = new Square(0, 0, 30,grid);
   console.log(inPlay.location);
   console.log(inPlay.position());
 
@@ -108,11 +135,24 @@ var handleKeys = function () {
 
   setInterval(function() {
 
+    // Put piece in final position
+    if (placing) {
+      placePiece();
+
+      inPlay = new Square(0,0,30, grid);
+      updateInPlay(inPlay);
+
+      placing = false;
+
+      //debugger;
+      return;
+    }
+
     // check if clear below piece
     if (inPlay.isClear(grid)) {
       // erase old position
       _.each(inPlay.positionGrid(), function(pos) {
-      if (grid[pos.x][pos.y] === undefined) debugger;
+      if (grid[pos.y][pos.x] === undefined) debugger;
         grid[pos.y][pos.x] = 0;
       });
 
@@ -123,6 +163,9 @@ var handleKeys = function () {
       _.each(inPlay.positionGrid(), function(pos) {
         grid[pos.y][pos.x] = 1;
       });
+    }
+    else {
+      placing = true;
     }
 
     // render in d3
