@@ -79,6 +79,25 @@ for (var i = 0; i < grid_height; i++) {
   }
 }
 
+var handleKeys = function () {
+  //console.log(event);
+  d3.event.preventDefault();
+  if (event.keyCode === 37) {
+    console.log('left!');
+  }
+  if (event.keyCode === 38) {
+    console.log('up!');
+  }
+  if (event.keyCode === 39) {
+    console.log('right!');
+  }
+  if (event.keyCode === 40) {
+    console.log('down!');
+  }
+}
+  // Capture keydown
+  d3.select("body").on("keydown", handleKeys);
+
   var grid = makeGrid(grid_height, grid_width);
   console.log(grid);
   var inPlay = new Square(0,0, 30);
