@@ -175,18 +175,21 @@ var handleKeys = function () {
       placing = false;
     }
     
-    // Put piece in final position
+    // Put piece in final position--------------
+    // ---------- this is d3 stuff--------------
     if (placing) {
       placePiece();
 
       inPlay = new Square(0,0,30, grid);
       updateInPlay(inPlay);
 
-      placing = false;
+      placing = false; // except this - should be part of TetrisField
 
       //debugger;
       return;
     }
+    // ---------------------------------------
+
 
     // check if clear below piece
     if (inPlay.isClear(grid)) {

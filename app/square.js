@@ -1,6 +1,6 @@
 var Square = function(x, y, size, grid){
   Tetromino.apply(this, arguments);
-
+  
 };
 
 Square.prototype = Object.create(Tetromino.prototype);
@@ -17,6 +17,10 @@ Square.prototype.position = function() {
           {x: this.location[0] * this.size, y: (this.location[1]+1) * this.size},
           {x: (this.location[0]+1) * this.size, y: (this.location[1]+1) * this.size}];
 };
+
+Square.prototype.checkRight = function() {
+  
+}
 
 Square.prototype.isClear = function() {
   var position = this.positionGrid();
